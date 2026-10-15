@@ -4,7 +4,7 @@
 
 MediTrust is a full-stack healthcare platform where patients can upload a prescription, get it automatically read and structured using AI, check medicine availability on the platform (with alternatives from other companies), book doctor appointments, book pathology/lab tests, and chat for basic health guidance — all in one place.
 
-Built and maintained by **Yaasir Sheikh**.
+Built and maintained by **Madhur raghuvanshi**.
 
 ## Table of Contents
 
