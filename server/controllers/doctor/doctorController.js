@@ -1,0 +1,169 @@
+import DoctorAppointment from "../../models/doctorAppointmentModel.js";
+import Doctor from "../../models/doctorModel.js";
+import Pathologist from "../../models/pathologistModel.js";
+import User from "../../models/userModel.js";
+
+const becomeDoctor = async (req, res) => {
+  const userId = req.user.id;
+
+  const {
+    clinicName,
+    address,
+    experience,
+    qualification,
+    specialization,
+    phone,
+    email,
+    consultationFee,
+    workingHours,
+    workingDays,
+  } = req.body;
+
+  if (
+    !clinicName ||
+    !address ||
+    !experience ||
+    !qualification ||
+    !specialization ||
+    !phone ||
+    !email ||
+    !consultationFee ||
+    !workingDays ||
+    !workingHours
+  ) {
+    res.status(409);
+    throw new Error("Please Fill All The Details..");
+  }
+
+  const newDoctor = await Doctor.create({
+    user: userId,
+    clinicName,
+    address,
+    experience,
+    qualification,
+    specialization,
+    phone,
+    email,
+    consultationFee,
+    workingDays,
+    workingHours,
+  });
+
+  if (!newDoctor) {
+    res.status(409);
+    throw new Error("Doctor Not Created...");
+  }
+
+  res.status(201).json(newDoctor);
+};
+
+const getALlAppointments = async (req, res) => {
+  const userId = req.user.id;
+
+  const user = await User.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("No User Found..");
+  }
+
+  if (user.userType !== "DOCTOR") {
+    res.status(401);
+    throw new Error("You Are Not Doctor");
+  }
+
+  const doctor = await Doctor.findOne({ user: user._id });
+
+  const appointments = await DoctorAppointment.find({
+    doctor: doctor._id,
+  }).populate("user");
+
+  if (!appointments) {
+    res.status(404);
+    throw new Error("No Appointments Found...");
+  }
+
+  res.status(200).json(appointments);
+};
+
+const updateAppointment = async (req, res) => {
+  const appointmentId = req.params.aid;
+  const appointment = await DoctorAppointment.findById(appointmentId);
+
+  if (!appointment) {
+    res.status(404);
+    throw new Error("Appointment Does Not Exist...");
+  }
+
+  const updatedAppointment = await DoctorAppointment.findByIdAndUpdate(
+    appointmentId,
+    req.body,
+    { new: true },
+  )
+    .populate("user")
+    .populate("doctor");
+
+  if (!updatedAppointment) {
+    res.status(409);
+    throw new Error("Appointment Is Not Updated...");
+  }
+
+  res.status(200).json(updatedAppointment);
+};
+
+const getAppointment = async (req, res) => {
+  const appointmentId = req.params.aid;
+  const appointment = await DoctorAppointment.findById(appointmentId)
+    .populate("user")
+    .populate("doctor");
+
+  if (!appointment) {
+    res.status(404);
+    throw new Error("Appointment Does Not Exist...");
+  }
+
+  res.status(200).json(appointment);
+};
+
+const getAllDoctors = async (req, res) => {
+  const doctors = await Doctor.find().populate("user");
+
+  if (!doctors) {
+    res.status(404);
+    throw new Error("Doctors Does Not Found...");
+  }
+
+  res.status(200).json(doctors);
+};
+
+const bookAppointment = async (req, res) => {
+  let userId = req.user.id;
+  let did = req.params.did;
+
+  const appointment = new DoctorAppointment({
+    user: userId,
+    doctor: did,
+  });
+
+  await appointment.save();
+  await appointment.populate("user");
+  await appointment.populate("doctor");
+
+  if (!appointment) {
+    res.status(409);
+    throw new Error("Appointment Is Not Booked...");
+  }
+
+  res.status(201).json(appointment);
+};
+
+const doctorController = {
+  becomeDoctor,
+  getALlAppointments,
+  getAppointment,
+  getAllDoctors,
+  updateAppointment,
+  bookAppointment,
+};
+
+export default doctorController;
