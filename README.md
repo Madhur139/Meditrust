@@ -226,7 +226,6 @@ MediTrust is built for **educational and demonstration purposes**. It is not a c
 
 ## About
 
-MediTrust is built and maintained by **Yaasir Sheikh**
+MediTrust is built and maintained by **Madhur Raghuvanshi**
 
-📸 Instagram: @beingyaasir
-💻 GitHub: Yaasir-786
+📸 Instagram: @itz.madhur.only
